@@ -6,6 +6,7 @@ type Product struct {
 	Price       float64 `json:"price"`
 	Description string  `json:"description"`
 	Count       int     `json:"count"`
+	Link        string  `json:"link"`
 }
 
 type User struct {

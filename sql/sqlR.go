@@ -10,12 +10,13 @@ import (
 
 // выборка данных
 func Getproducts() []st.Product {
+	query := "SELECT product.id, `name`, `description`, `price`, `count`, `link` FROM `shop`.`product`INNER JOIN `shop`.`links` ON product.id = links.id"
 	db, err := sql.Open("mysql", "root:admin@tcp(127.0.0.1:8080)/shop")
 	if err != nil {
 		log.Fatal("не удалось подключиться к базе данных: ", err.Error())
 	}
 	log.Println("Подключение успешное")
-	res, err := db.Query("SELECT * FROM `shop`.`product`")
+	res, err := db.Query(query)
 	if err != nil {
 		log.Fatal("Не удалось выполнить запрос: ", err.Error())
 	}
@@ -23,7 +24,7 @@ func Getproducts() []st.Product {
 	var products []st.Product
 	for res.Next() {
 		var p st.Product
-		err = res.Scan(&p.Id, &p.Name, &p.Description, &p.Price, &p.Count)
+		err = res.Scan(&p.Id, &p.Name, &p.Description, &p.Price, &p.Count, &p.Link)
 		if err != nil {
 			log.Fatal("Не удалось получить данные: ", err.Error())
 		}
