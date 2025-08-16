@@ -3,7 +3,7 @@ package main
 import (
 	_ "database/sql"
 	_ "fmt"
-	urls "www/URLS"
+	hand "www/handler"
 	_ "www/structs"
 
 	_ "github.com/go-sql-driver/mysql"
@@ -12,7 +12,7 @@ import (
 func main() {
 
 	//handleRequest()
-	urls.HandleRequest()
+	hand.HandleRequest()
 
 }
 

@@ -37,3 +37,30 @@ func Getproducts() []st.Product {
 	defer res.Close()
 	return products
 }
+
+func GetproductById(id string) st.Product {
+	query := "SELECT product.id, `name`, `description`, `price`, `count`, `link` FROM `shop`.`product`INNER JOIN `shop`.`links` ON product.id = links.id where product.id =?"
+	db, err := sql.Open("mysql", "root:admin@tcp(:3306)/shop")
+	if err != nil {
+		log.Fatal("не удалось подключиться к базе данных: ", err.Error())
+	}
+	log.Println("Подключение успешное")
+	res, err := db.Query(query, id)
+	if err != nil {
+		log.Fatal("Не удалось выполнить запрос: ", err.Error())
+	}
+	log.Println("Запрос на выборку данных выполнился")
+	var p st.Product
+	for res.Next() {
+		err = res.Scan(&p.Id, &p.Name, &p.Description, &p.Price, &p.Count, &p.Link)
+		if err != nil {
+			log.Fatal("Не удалось получить данные: ", err.Error())
+		}
+	}
+	defer func() {
+		db.Close()
+		log.Println("Отключился от бд")
+	}()
+	defer res.Close()
+	return p
+}
