@@ -11,7 +11,7 @@ import (
 // выборка данных
 func Getproducts() []st.Product {
 	query := "SELECT product.id, `name`, `description`, `price`, `count`, `link` FROM `shop`.`product`INNER JOIN `shop`.`links` ON product.id = links.id"
-	db, err := sql.Open("mysql", "root:admin@tcp(127.0.0.1:8080)/shop")
+	db, err := sql.Open("mysql", "root:admin@tcp(:3306)/shop")
 	if err != nil {
 		log.Fatal("не удалось подключиться к базе данных: ", err.Error())
 	}
