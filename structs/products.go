@@ -9,12 +9,6 @@ type Product struct {
 	Link        string  `json:"link"`
 }
 
-type User struct {
-	Id    int     `json:"id"`
-	Name  string  `json:"name"`
-	Money float64 `json:"money"`
-}
-
 /* func (p Product) GetProdId() int {
 	return p.id
 }
