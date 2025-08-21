@@ -13,6 +13,7 @@ func HandleRequest() {
 	http.Handle("/cart/static/", http.StripPrefix("/cart/static/", http.FileServer(http.Dir("./static/"))))
 	http.HandleFunc("/shop/", urls.HomePage)
 	http.HandleFunc("/profile/", urls.Profile)
+	http.HandleFunc("/buy/", urls.Buy)
 	http.HandleFunc("/exit/", urls.Exit)
 	http.HandleFunc("/cart/", urls.Cart)
 	http.HandleFunc("/product/", urls.ProductPage)

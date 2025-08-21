@@ -15,11 +15,13 @@ func Redirect(w http.ResponseWriter, r *http.Request, u st.User) {
 	user := st.User{}
 	if u == user {
 		http.Redirect(w, r, "/signin/", http.StatusFound)
+	} else {
+		log.Println("Пользователь не пустой")
 	}
 }
 func HomePage(w http.ResponseWriter, r *http.Request) {
+	Redirect(w, r, loginedUser)
 	if r.Method == "POST" {
-		Redirect(w, r, loginedUser)
 		num := r.URL.Query().Get("id")
 		sqlR.AddInCart(num, strconv.Itoa(loginedUser.Id))
 		http.Redirect(w, r, "/shop/", http.StatusFound)
@@ -81,11 +83,32 @@ func Cart(w http.ResponseWriter, r *http.Request) {
 	Redirect(w, r, loginedUser)
 	if r.Method == "POST" {
 		id := r.URL.Query().Get("id")
-		log.Println(id)
 		sqlR.DeletProdInCart(strconv.Itoa(loginedUser.Id), id)
 		http.Redirect(w, r, "/cart/", http.StatusFound)
 	}
 	p, _ := sqlR.ProdInCart(strconv.Itoa(loginedUser.Id))
 	tmpl, _ := template.ParseFiles("templates/cart.html", "templates/footer.html", "templates/header.html")
 	tmpl.Execute(w, p)
+}
+func Buy(w http.ResponseWriter, r *http.Request) {
+	Redirect(w, r, loginedUser)
+	if r.Method == "POST" {
+		var sum float64
+		p, _ := sqlR.ProdInCart(strconv.Itoa(loginedUser.Id))
+		for _, s := range p {
+			sum += s.Price
+		}
+		if sum <= loginedUser.Money {
+			loginedUser.Money = loginedUser.Money - sum
+			sqlR.ChangeMoney(loginedUser.Money, strconv.Itoa(loginedUser.Id))
+			sqlR.DeleteToBuy(strconv.Itoa(loginedUser.Id))
+			for _, prod := range p {
+				sqlR.Buy(strconv.Itoa(loginedUser.Id), strconv.Itoa(prod.Id))
+				sqlR.ChangeCountProd(prod.Count-1, prod.Id)
+			}
+			http.Redirect(w, r, "/cart/", http.StatusFound)
+		} else {
+			http.Redirect(w, r, "/cart/", http.StatusFound)
+		}
+	}
 }

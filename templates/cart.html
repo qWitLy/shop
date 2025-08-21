@@ -51,7 +51,7 @@
         {{ if .}}
             <div class="col-lg-6 col-xxl-4 my-5 mx-auto"> 
                 <div class="d-grid gap-2"> 
-                    <button class="btn btn-success" type="button">Купить</button> 
+                    <button class="btn btn-success" type="button" onclick="postToUrl('/buy/', 'POST')">Купить</button> 
                 </div> 
             </div> 
         {{ end }}
