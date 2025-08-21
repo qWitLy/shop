@@ -2,8 +2,8 @@ package urls
 
 import (
 	"html/template"
-	"log"
 	"net/http"
+	"strconv"
 	sqlR "www/sql"
 	st "www/structs"
 )
@@ -17,6 +17,12 @@ func Redirect(w http.ResponseWriter, r *http.Request, u st.User) {
 	}
 }
 func HomePage(w http.ResponseWriter, r *http.Request) {
+	if r.Method == "POST" {
+		Redirect(w, r, loginedUser)
+		num := r.URL.Query().Get("id")
+		sqlR.AddInCart(num, strconv.Itoa(loginedUser.Id))
+		http.Redirect(w, r, "/shop/", http.StatusFound)
+	}
 	var p = sqlR.Getproducts()
 	tmpl, _ := template.ParseFiles("templates/home_page.html", "templates/footer.html", "templates/header.html")
 	tmpl.Execute(w, p)
@@ -37,7 +43,6 @@ func SignIn(w http.ResponseWriter, r *http.Request) {
 		}
 		if user, result := sqlR.GetUser(data); result {
 			loginedUser = user
-			log.Println(result)
 			http.Redirect(w, r, "/shop/", http.StatusFound)
 		} else {
 			message = "Такого пользователя не существует"
@@ -60,8 +65,8 @@ func SignUp(w http.ResponseWriter, r *http.Request) {
 }
 
 func Profile(w http.ResponseWriter, r *http.Request) {
-	tmpl, _ := template.ParseFiles("templates/profile.html", "templates/footer.html", "templates/header.html")
 	Redirect(w, r, loginedUser)
+	tmpl, _ := template.ParseFiles("templates/profile.html", "templates/footer.html", "templates/header.html")
 	tmpl.Execute(w, loginedUser)
 }
 
@@ -69,4 +74,11 @@ func Exit(w http.ResponseWriter, r *http.Request) {
 	user := st.User{}
 	loginedUser = user
 	http.Redirect(w, r, "/signin/", http.StatusFound)
+}
+
+func Cart(w http.ResponseWriter, r *http.Request) {
+	Redirect(w, r, loginedUser)
+	p := sqlR.ProdInCart(strconv.Itoa(loginedUser.Id))
+	tmpl, _ := template.ParseFiles("templates/cart.html", "templates/footer.html", "templates/header.html")
+	tmpl.Execute(w, p)
 }
