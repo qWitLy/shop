@@ -2,6 +2,7 @@ package urls
 
 import (
 	"html/template"
+	"log"
 	"net/http"
 	"strconv"
 	sqlR "www/sql"
@@ -78,6 +79,12 @@ func Exit(w http.ResponseWriter, r *http.Request) {
 
 func Cart(w http.ResponseWriter, r *http.Request) {
 	Redirect(w, r, loginedUser)
+	if r.Method == "POST" {
+		id := r.URL.Query().Get("id")
+		log.Println(id)
+		sqlR.DeletProdInCart(strconv.Itoa(loginedUser.Id), id)
+		http.Redirect(w, r, "/cart/", http.StatusFound)
+	}
 	p, _ := sqlR.ProdInCart(strconv.Itoa(loginedUser.Id))
 	tmpl, _ := template.ParseFiles("templates/cart.html", "templates/footer.html", "templates/header.html")
 	tmpl.Execute(w, p)

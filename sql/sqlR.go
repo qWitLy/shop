@@ -157,3 +157,23 @@ func ProdInCart(userId string) ([]st.Product, bool) {
 	defer res.Close()
 	return products, true
 }
+
+func DeletProdInCart(userId, prodId string) {
+	query := "DELETE FROM `shop`.`produs` WHERE user_id = ? and  product_id = ?"
+	db, err := sql.Open(nameDb, connectionString)
+	if err != nil {
+		log.Fatal("не удалось подключиться к базе данных: ", err.Error())
+	}
+	log.Println("Подключение успешное")
+	res, err := db.Query(query, userId, prodId)
+	if err != nil {
+		log.Fatal("Не удалось выполнить запрос: ", err.Error())
+	}
+	log.Println("Запрос на удаление выполнился")
+	defer func() {
+		db.Close()
+		log.Println("Отключился от бд")
+	}()
+	defer res.Close()
+
+}
