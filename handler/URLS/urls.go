@@ -78,7 +78,7 @@ func Exit(w http.ResponseWriter, r *http.Request) {
 
 func Cart(w http.ResponseWriter, r *http.Request) {
 	Redirect(w, r, loginedUser)
-	p := sqlR.ProdInCart(strconv.Itoa(loginedUser.Id))
+	p, _ := sqlR.ProdInCart(strconv.Itoa(loginedUser.Id))
 	tmpl, _ := template.ParseFiles("templates/cart.html", "templates/footer.html", "templates/header.html")
 	tmpl.Execute(w, p)
 }

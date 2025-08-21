@@ -129,7 +129,7 @@ func AddInCart(prodId, userId string) bool {
 	return true
 }
 
-func ProdInCart(userId string) []st.Product {
+func ProdInCart(userId string) ([]st.Product, bool) {
 	query := "SELECT product.id, `name`, `description`, `price`, `count`, `link` FROM `shop`.`product`INNER JOIN `shop`.`links` ON product.id = links.id_prod INNER JOIN `shop`.`produs` ON product.id = produs.product_id where `user_id` = ?"
 	db, err := sql.Open(nameDb, connectionString)
 	if err != nil {
@@ -146,7 +146,7 @@ func ProdInCart(userId string) []st.Product {
 		var p st.Product
 		err = res.Scan(&p.Id, &p.Name, &p.Description, &p.Price, &p.Count, &p.Link)
 		if err != nil {
-			log.Fatal("Не удалось получить данные: ", err.Error())
+			return products, false
 		}
 		products = append(products, p)
 	}
@@ -155,5 +155,5 @@ func ProdInCart(userId string) []st.Product {
 		log.Println("Отключился от бд")
 	}()
 	defer res.Close()
-	return products
+	return products, true
 }
