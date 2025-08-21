@@ -75,23 +75,18 @@ func GetUser(u st.User) (st.User, bool) {
 		log.Fatal("не удалось подключиться к базе данных: ", err.Error())
 	}
 	log.Println("Подключение успешное")
-	res, err := db.Query(query, u.Login, u.Password)
-	if err != nil {
-		log.Fatal("Не удалось выполнить запрос: ", err.Error())
-	}
+	res := db.QueryRow(query, u.Login, u.Password)
 	var user st.User
-	for res.Next() {
-		err = res.Scan(&user.Id, &user.Login, &user.Password, &user.Money)
-		if err != nil {
-			log.Fatal("такого пользователя не существует: ", err.Error())
-		}
-
+	check := st.User{}
+	err = res.Scan(&user.Id, &user.Login, &user.Password, &user.Money)
+	if err != nil {
+		user = check
+		return user, false
 	}
 	defer func() {
 		db.Close()
 		log.Println("Отключился от бд")
 	}()
-	defer res.Close()
 	return user, true
 }
 

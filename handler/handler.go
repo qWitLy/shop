@@ -12,6 +12,7 @@ func HandleRequest() {
 	http.Handle("/signin/static/", http.StripPrefix("/signin/static/", http.FileServer(http.Dir("./static/"))))
 	http.HandleFunc("/shop/", urls.HomePage)
 	http.HandleFunc("/profile/", urls.Profile)
+	http.HandleFunc("/exit/", urls.Exit)
 	http.HandleFunc("/product/", urls.ProductPage)
 	http.HandleFunc("/signup/", urls.SignUp)
 	http.HandleFunc("/signin/", urls.SignIn)

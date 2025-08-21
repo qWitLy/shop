@@ -2,6 +2,7 @@ package urls
 
 import (
 	"html/template"
+	"log"
 	"net/http"
 	sqlR "www/sql"
 	st "www/structs"
@@ -36,6 +37,7 @@ func SignIn(w http.ResponseWriter, r *http.Request) {
 		}
 		if user, result := sqlR.GetUser(data); result {
 			loginedUser = user
+			log.Println(result)
 			http.Redirect(w, r, "/shop/", http.StatusFound)
 		} else {
 			message = "Такого пользователя не существует"
@@ -61,4 +63,10 @@ func Profile(w http.ResponseWriter, r *http.Request) {
 	tmpl, _ := template.ParseFiles("templates/profile.html", "templates/footer.html", "templates/header.html")
 	Redirect(w, r, loginedUser)
 	tmpl.Execute(w, loginedUser)
+}
+
+func Exit(w http.ResponseWriter, r *http.Request) {
+	user := st.User{}
+	loginedUser = user
+	http.Redirect(w, r, "/signin/", http.StatusFound)
 }
