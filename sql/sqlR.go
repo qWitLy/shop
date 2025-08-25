@@ -130,7 +130,7 @@ func AddInCart(prodId, userId string) bool {
 }
 
 func ProdInCart(userId string) ([]st.Product, bool) {
-	query := "SELECT product.id, `name`, `description`, `price`, `count`, `link` FROM `shop`.`product`INNER JOIN `shop`.`links` ON product.id = links.id_prod INNER JOIN `shop`.`produs` ON product.id = produs.product_id where `user_id` = ?"
+	query := "SELECT product.id, `name`, `description`, `price`, `count`, `link` FROM `shop`.`product`INNER JOIN `shop`.`links` ON product.id = links.id_prod INNER JOIN `shop`.`produs` ON product.id = produs.product_id where `user_id` = ? AND produs.buyed = false"
 	db, err := sql.Open(nameDb, connectionString)
 	if err != nil {
 		log.Fatal("не удалось подключиться к базе данных: ", err.Error())
@@ -159,7 +159,7 @@ func ProdInCart(userId string) ([]st.Product, bool) {
 }
 
 func DeletProdInCart(userId, prodId string) {
-	query := "DELETE FROM `shop`.`produs` WHERE user_id = ? and  product_id = ?"
+	query := "DELETE FROM `shop`.`produs` WHERE user_id = ? and  product_id = ? and buyed = false "
 	db, err := sql.Open(nameDb, connectionString)
 	if err != nil {
 		log.Fatal("не удалось подключиться к базе данных: ", err.Error())
@@ -197,33 +197,14 @@ func ChangeMoney(money float64, userId string) {
 	defer res.Close()
 }
 
-func DeleteToBuy(userId string) {
-	query := "DELETE FROM `shop`.`produs` WHERE user_id = ?"
+func Buy(buy bool, userId, prodId string) {
+	query := "UPDATE `shop`.`produs` SET `buyed` = ? WHERE `product_id` = ? AND `user_id` = ? "
 	db, err := sql.Open(nameDb, connectionString)
 	if err != nil {
 		log.Fatal("не удалось подключиться к базе данных: ", err.Error())
 	}
 	log.Println("Подключение успешное")
-	res, err := db.Query(query, userId)
-	if err != nil {
-		log.Fatal("Не удалось выполнить запрос: ", err.Error())
-	}
-	log.Println("Запрос на удаление для покупки выполнился")
-	defer func() {
-		db.Close()
-		log.Println("Отключился от бд")
-	}()
-	defer res.Close()
-}
-
-func Buy(userId, prodId string) {
-	query := "INSERT INTO `shop`.`buys`(`usId`,`prodId`) VALUES(?,?)"
-	db, err := sql.Open(nameDb, connectionString)
-	if err != nil {
-		log.Fatal("не удалось подключиться к базе данных: ", err.Error())
-	}
-	log.Println("Подключение успешное")
-	res, err := db.Query(query, userId, prodId)
+	res, err := db.Query(query, buy, prodId, userId)
 	if err != nil {
 		log.Fatal("Не удалось выполнить запрос: ", err.Error())
 	}

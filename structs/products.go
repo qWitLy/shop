@@ -7,6 +7,7 @@ type Product struct {
 	Description string  `json:"description"`
 	Count       int     `json:"count"`
 	Link        string  `json:"link"`
+	Buyed       bool    `json:"buyed"`
 }
 
 /* func (p Product) GetProdId() int {

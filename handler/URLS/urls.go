@@ -101,9 +101,8 @@ func Buy(w http.ResponseWriter, r *http.Request) {
 		if sum <= loginedUser.Money {
 			loginedUser.Money = loginedUser.Money - sum
 			sqlR.ChangeMoney(loginedUser.Money, strconv.Itoa(loginedUser.Id))
-			sqlR.DeleteToBuy(strconv.Itoa(loginedUser.Id))
 			for _, prod := range p {
-				sqlR.Buy(strconv.Itoa(loginedUser.Id), strconv.Itoa(prod.Id))
+				sqlR.Buy(true, strconv.Itoa(loginedUser.Id), strconv.Itoa(prod.Id))
 				sqlR.ChangeCountProd(prod.Count-1, prod.Id)
 			}
 			http.Redirect(w, r, "/cart/", http.StatusFound)
