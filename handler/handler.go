@@ -19,5 +19,6 @@ func HandleRequest() {
 	http.HandleFunc("/product/", urls.ProductPage)
 	http.HandleFunc("/signup/", urls.SignUp)
 	http.HandleFunc("/signin/", urls.SignIn)
+	http.HandleFunc("/replenishment/", urls.Replenishment)
 	http.ListenAndServe(":3030", nil)
 }

@@ -2,25 +2,27 @@ package urls
 
 import (
 	"html/template"
-	"log"
 	"net/http"
 	"strconv"
+	coockieFile "www/handler/coockie"
 	sqlR "www/sql"
 	st "www/structs"
 )
 
 var loginedUser st.User
 
-func Redirect(w http.ResponseWriter, r *http.Request, u st.User) {
-	user := st.User{}
-	if u == user {
-		http.Redirect(w, r, "/signin/", http.StatusFound)
-	} else {
-		log.Println("Пользователь не пустой")
+/*
+	 func Redirect(w http.ResponseWriter, r *http.Request, u st.User) {
+		user := st.User{}
+		if u == user {
+			http.Redirect(w, r, "/signin/", http.StatusFound)
+		} else {
+			log.Println("Пользователь не пустой")
+		}
 	}
-}
+*/
 func HomePage(w http.ResponseWriter, r *http.Request) {
-	Redirect(w, r, loginedUser)
+	coockieFile.CheckCoockie(w, r)
 	if r.Method == "POST" {
 		num := r.URL.Query().Get("id")
 		sqlR.AddInCart(num, strconv.Itoa(loginedUser.Id))
@@ -46,6 +48,7 @@ func SignIn(w http.ResponseWriter, r *http.Request) {
 		}
 		if user, result := sqlR.GetUser(data); result {
 			loginedUser = user
+			coockieFile.GetCoockie(w, r)
 			http.Redirect(w, r, "/shop/", http.StatusFound)
 		} else {
 			message = "Такого пользователя не существует"
@@ -62,13 +65,13 @@ func SignUp(w http.ResponseWriter, r *http.Request) {
 			Password: r.FormValue("password"),
 		}
 		sqlR.RegistrUser(data)
-		http.Redirect(w, r, "/login/", http.StatusFound)
+		http.Redirect(w, r, "/signin/", http.StatusFound)
 	}
 	tmpl.Execute(w, nil)
 }
 
 func Profile(w http.ResponseWriter, r *http.Request) {
-	Redirect(w, r, loginedUser)
+	coockieFile.CheckCoockie(w, r)
 	tmpl, _ := template.ParseFiles("templates/profile.html", "templates/footer.html", "templates/header.html")
 	tmpl.Execute(w, loginedUser)
 }
@@ -80,7 +83,7 @@ func Exit(w http.ResponseWriter, r *http.Request) {
 }
 
 func Cart(w http.ResponseWriter, r *http.Request) {
-	Redirect(w, r, loginedUser)
+	coockieFile.CheckCoockie(w, r)
 	if r.Method == "POST" {
 		id := r.URL.Query().Get("id")
 		sqlR.DeletProdInCart(strconv.Itoa(loginedUser.Id), id)
@@ -91,7 +94,7 @@ func Cart(w http.ResponseWriter, r *http.Request) {
 	tmpl.Execute(w, p)
 }
 func Buy(w http.ResponseWriter, r *http.Request) {
-	Redirect(w, r, loginedUser)
+	coockieFile.CheckCoockie(w, r)
 	if r.Method == "POST" {
 		var sum float64
 		p, _ := sqlR.ProdInCart(strconv.Itoa(loginedUser.Id))
@@ -110,4 +113,17 @@ func Buy(w http.ResponseWriter, r *http.Request) {
 			http.Redirect(w, r, "/cart/", http.StatusFound)
 		}
 	}
+}
+
+func Replenishment(w http.ResponseWriter, r *http.Request) {
+	coockieFile.CheckCoockie(w, r)
+	if r.Method == "POST" {
+		money := r.FormValue("money")
+		m, _ := strconv.ParseFloat(money, 64)
+		loginedUser.Money += m
+		sqlR.ChangeMoney(loginedUser.Money, strconv.Itoa(loginedUser.Id))
+		http.Redirect(w, r, "/shop/", http.StatusFound)
+	}
+	tmpl, _ := template.ParseFiles("templates/replenushment.html", "templates/footer.html", "templates/header.html")
+	tmpl.Execute(w, nil)
 }

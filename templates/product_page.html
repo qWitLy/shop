@@ -21,7 +21,11 @@
                         <h3 class="mb-0">{{ .Name }}</h3> 
                         <p class="card-text mb-auto">{{.Description}}</p>  
                         <div class="d-flex align-items-end flex-column mb-2"> 
-                            <a href="#" onclick="postToUrl('/shop/?id={{.Id}}', 'POST')" class="btn btn-lg btn-outline-success">В корзину</a> 
+                            {{ if ne .Count 0}}
+                                <a href="#" onclick="postToUrl('/shop/?id={{.Id}}', 'POST')" class="btn btn-lg btn-outline-success">В корзину</a>
+                            {{else}}
+                                <button type="button" class="btn btn-lg btn-outline-success" disabled>Нет в наличии</button>
+                            {{end}} 
                             <div class="text-body-primary">{{ .Price }}р. - Количество: {{ .Count }}</div> 
                         </div> 
                     </div> 
